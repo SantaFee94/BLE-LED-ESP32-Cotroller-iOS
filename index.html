@@ -197,16 +197,6 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:24px; h
 .nav-item.active { color:var(--text); }
 .nav-item.active .nav-icon { filter:drop-shadow(0 0 8px var(--accent)); }
 
-/* OVERLAY */
-.overlay { position:fixed; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center; gap:16px; background:rgba(8,8,16,0.9); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); padding:32px; }
-.overlay.visible { display:flex; }
-.overlay-icon { font-size:64px; animation:float 3s ease-in-out infinite; }
-@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
-.overlay-title { font-size:28px; font-weight:800; }
-.overlay-sub { font-size:14px; color:var(--muted); text-align:center; line-height:1.6; max-width:260px; }
-.connect-btn { padding:16px 40px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border:none; border-radius:50px; color:white; font-family:'Syne',sans-serif; font-size:16px; font-weight:700; cursor:pointer; box-shadow:0 8px 30px rgba(124,92,252,0.4); transition:transform 0.2s; margin-top:8px; }
-.connect-btn:active { transform:scale(0.96); }
-.overlay-hint { font-size:12px; color:var(--muted); text-align:center; line-height:1.6; }
 
 /* TOAST */
 .toast { position:fixed; bottom:calc(var(--safe-bottom) + 100px); left:50%; transform:translateX(-50%) translateY(20px); background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:10px 22px; border-radius:20px; font-size:13px; font-family:'DM Mono',monospace; opacity:0; transition:all 0.3s; z-index:200; white-space:nowrap; pointer-events:none; }
@@ -222,15 +212,6 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:24px; h
     <div class="dot"></div>
     <span id="bleBtnText">Verbinden</span>
   </button>
-</div>
-
-<!-- Overlay -->
-<div class="overlay" id="overlay">
-  <div class="overlay-icon">💡</div>
-  <div class="overlay-title">LumaControl</div>
-  <div class="overlay-sub">Verbinde dich mit deinem ESP32 LED Controller über Bluetooth</div>
-  <button class="connect-btn" onclick="toggleBLE()">Jetzt verbinden</button>
-  <div class="overlay-hint">Benötigt <strong>Bluefy Browser</strong> (App Store)<br>oder Chrome/Edge auf Android</div>
 </div>
 
 <!-- Content -->
@@ -724,10 +705,7 @@ function dismissInstall() {
   localStorage.setItem('installDismissed','1');
 }
 
-// Init BLE overlay on load
-window.addEventListener('load', () => {
-  if (!isConnected) document.getElementById('overlay').classList.add('visible');
-});
+
 const SVC       = '12345678-1234-1234-1234-123456789abc';
 const CHAR      = '12345678-1234-1234-1234-123456789001';
 const CHAR_INFO = '12345678-1234-1234-1234-123456789002';
@@ -796,8 +774,8 @@ function setConnected(val) {
   isConnected = val;
   document.getElementById('bleBtn').classList.toggle('connected', val);
   document.getElementById('bleBtnText').textContent = val ? 'Verbunden' : 'Verbinden';
-  if (!val) document.getElementById('overlay').classList.add('visible');
-  else document.getElementById('overlay').classList.remove('visible');
+
+
   document.getElementById('infoStatus').textContent = val ? '🟢 Verbunden' : '🔴 Getrennt';
 }
 
