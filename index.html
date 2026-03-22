@@ -485,7 +485,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:24px; h
       </button>
 
       <!-- Gespeichert-Hinweis -->
-      <div class="saved-hint" id="savedHint">✅ Gespeichert! ESP blinkt grün zur Bestätigung.</div>
+      <div class="saved-hint" id="savedHint">✅ Gespeichert! ESP startet neu und wendet die Einstellungen an (~3 Sek.).</div>
     </div>
 
     <!-- Info vom ESP -->
@@ -802,7 +802,16 @@ function saveLEDConfig() {
 
   const hint = document.getElementById('savedHint');
   hint.classList.add('visible');
-  setTimeout(() => hint.classList.remove('visible'), 4000);
+  setTimeout(() => hint.classList.remove('visible'), 6000);
+
+  // ESP startet neu → nach 4 Sek. automatisch neu verbinden
+  if (isConnected) {
+    showToast('🔄 ESP startet neu...');
+    setTimeout(() => {
+      showToast('🔍 Verbinde neu...');
+      toggleBLE();
+    }, 4000);
+  }
 }
 
 function updateInfoPanel() {
