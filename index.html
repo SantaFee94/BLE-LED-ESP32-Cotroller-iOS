@@ -165,7 +165,19 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:24px; h
 .info-key { font-size:13px; color:var(--muted); }
 .info-val { font-family:'DM Mono',monospace; font-size:13px; font-weight:500; }
 
-/* INSTALL BANNER */
+/* EFFECT TABS */
+.effect-tab-panel { display:none; flex-direction:column; gap:16px; }
+.effect-tab-panel.active { display:flex; }
+
+/* DANGER BUTTONS */
+.danger-row { display:flex; gap:10px; }
+.danger-btn { flex:1; padding:14px 8px; border:none; border-radius:14px; font-family:'Syne',sans-serif; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.danger-btn:active { transform:scale(0.96); }
+.btn-restart { background:rgba(255,160,0,0.15); border:1px solid rgba(255,160,0,0.4); color:#ffa000; }
+.btn-restart:active { background:rgba(255,160,0,0.3); }
+.btn-shutdown { background:rgba(255,50,50,0.15); border:1px solid rgba(255,50,50,0.4); color:#ff3232; }
+.btn-shutdown:active { background:rgba(255,50,50,0.3); }
+.danger-icon { font-size:22px; }
 .install-banner { display:none; align-items:center; gap:12px; padding:14px 18px; background:linear-gradient(135deg,rgba(124,92,252,0.2),rgba(252,92,125,0.15)); border:1px solid rgba(124,92,252,0.3); border-radius:16px; cursor:pointer; }
 .install-banner.visible { display:flex; }
 .install-icon { font-size:28px; }
@@ -308,61 +320,182 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:24px; h
 
   <!-- PAGE: Effekte -->
   <div class="page" id="page-effects">
-    <div class="card">
-      <div class="card-title">Effekte</div>
-      <div class="effects-grid" id="effectsGrid">
-        <div class="effect-btn active" data-id="0"  onclick="selectEffect(0)"><div class="icon">⬛</div>Solid</div>
-        <div class="effect-btn" data-id="1"  onclick="selectEffect(1)"><div class="icon">🌈</div>Rainbow</div>
-        <div class="effect-btn" data-id="2"  onclick="selectEffect(2)"><div class="icon">💫</div>Pulse</div>
-        <div class="effect-btn" data-id="3"  onclick="selectEffect(3)"><div class="icon">☄️</div>Meteor</div>
-        <div class="effect-btn" data-id="4"  onclick="selectEffect(4)"><div class="icon">🔥</div>Fire</div>
-        <div class="effect-btn" data-id="5"  onclick="selectEffect(5)"><div class="icon">✨</div>Twinkle</div>
-        <div class="effect-btn" data-id="6"  onclick="selectEffect(6)"><div class="icon">🌊</div>Wave</div>
-        <div class="effect-btn" data-id="7"  onclick="selectEffect(7)"><div class="icon">🎊</div>Konfetti</div>
-        <div class="effect-btn" data-id="8"  onclick="selectEffect(8)"><div class="icon">🖌️</div>Color Wipe</div>
-        <div class="effect-btn" data-id="9"  onclick="selectEffect(9)"><div class="icon">🎭</div>Theater</div>
-        <div class="effect-btn" data-id="10" onclick="selectEffect(10)"><div class="icon">⚡</div>Strobe</div>
-        <div class="effect-btn" data-id="11" onclick="selectEffect(11)"><div class="icon">🚗</div>Larson</div>
-        <div class="effect-btn" data-id="12" onclick="selectEffect(12)"><div class="icon">🏃</div>Running</div>
-        <div class="effect-btn" data-id="13" onclick="selectEffect(13)"><div class="icon">🌈</div>RainbowChase</div>
-        <div class="effect-btn" data-id="14" onclick="selectEffect(14)"><div class="icon">↔️</div>Dual Scan</div>
-        <div class="effect-btn" data-id="15" onclick="selectEffect(15)"><div class="icon">🧊</div>Ice</div>
-        <div class="effect-btn" data-id="16" onclick="selectEffect(16)"><div class="icon">💨</div>Comet</div>
-        <div class="effect-btn" data-id="17" onclick="selectEffect(17)"><div class="icon">✦</div>Sparkle</div>
-        <div class="effect-btn" data-id="18" onclick="selectEffect(18)"><div class="icon">❄️</div>Snow</div>
-        <div class="effect-btn" data-id="19" onclick="selectEffect(19)"><div class="icon">⚽</div>Bounce</div>
-        <div class="effect-btn" data-id="20" onclick="selectEffect(20)"><div class="icon">❤️</div>Heartbeat</div>
-        <div class="effect-btn" data-id="21" onclick="selectEffect(21)"><div class="icon">🔮</div>Plasma</div>
-        <div class="effect-btn" data-id="22" onclick="selectEffect(22)"><div class="icon">🎨</div>ColorFade</div>
-        <div class="effect-btn" data-id="23" onclick="selectEffect(23)"><div class="icon">👁️</div>Cylon</div>
-        <div class="effect-btn" data-id="24" onclick="selectEffect(24)"><div class="icon">💧</div>Ripple</div>
-        <div class="effect-btn" data-id="25" onclick="selectEffect(25)"><div class="icon">🌋</div>Lava</div>
-        <div class="effect-btn" data-id="26" onclick="selectEffect(26)"><div class="icon">🌊</div>Ocean</div>
-        <div class="effect-btn" data-id="27" onclick="selectEffect(27)"><div class="icon">🌿</div>Forest</div>
-        <div class="effect-btn" data-id="28" onclick="selectEffect(28)"><div class="icon">🥳</div>Party</div>
-        <div class="effect-btn" data-id="29" onclick="selectEffect(29)"><div class="icon">🏖️</div>Pacifica</div>
-        <div class="effect-btn" data-id="30" onclick="selectEffect(30)"><div class="icon">🏳️‍🌈</div>Pride</div>
-        <div class="effect-btn" data-id="31" onclick="selectEffect(31)"><div class="icon">🚔</div>Police</div>
-        <div class="effect-btn" data-id="32" onclick="selectEffect(32)"><div class="icon">🎄</div>Xmas</div>
-        <div class="effect-btn" data-id="33" onclick="selectEffect(33)"><div class="icon">🎃</div>Halloween</div>
-        <div class="effect-btn" data-id="34" onclick="selectEffect(34)"><div class="icon">🌅</div>Gradient</div>
-        <div class="effect-btn" data-id="35" onclick="selectEffect(35)"><div class="icon">🏁</div>BiChase</div>
-        <div class="effect-btn" data-id="36" onclick="selectEffect(36)"><div class="icon">🎠</div>WipeColors</div>
-        <div class="effect-btn" data-id="37" onclick="selectEffect(37)"><div class="icon">〰️</div>Sinelon</div>
-        <div class="effect-btn" data-id="38" onclick="selectEffect(38)"><div class="icon">🤹</div>Juggle</div>
-        <div class="effect-btn" data-id="39" onclick="selectEffect(39)"><div class="icon">🥁</div>BPM</div>
-        <div class="effect-btn" data-id="40" onclick="selectEffect(40)"><div class="icon">📡</div>Noise</div>
-        <div class="effect-btn" data-id="41" onclick="selectEffect(41)"><div class="icon">🌄</div>Sunrise</div>
-        <div class="effect-btn" data-id="42" onclick="selectEffect(42)"><div class="icon">🌧️</div>Waterfall</div>
-        <div class="effect-btn" data-id="43" onclick="selectEffect(43)"><div class="icon">💚</div>Matrix</div>
-        <div class="effect-btn" data-id="44" onclick="selectEffect(44)"><div class="icon">🌌</div>Aurora</div>
-        <div class="effect-btn" data-id="45" onclick="selectEffect(45)"><div class="icon">🍭</div>Candy</div>
-        <div class="effect-btn" data-id="46" onclick="selectEffect(46)"><div class="icon">💎</div>Glitter</div>
-        <div class="effect-btn" data-id="47" onclick="selectEffect(47)"><div class="icon">🎆</div>Fireworks</div>
-        <div class="effect-btn" data-id="48" onclick="selectEffect(48)"><div class="icon">🌩️</div>Lightning</div>
-        <div class="effect-btn" data-id="49" onclick="selectEffect(49)"><div class="icon">🕺</div>Disco</div>
+
+    <!-- Kategorie Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchEffectTab('wow')">🌟 WOW (100)</div>
+      <div class="tab" onclick="switchEffectTab('auto')">🚗 Auto (50)</div>
+    </div>
+
+    <!-- WOW Effekte -->
+    <div class="effect-tab-panel active" id="etab-wow">
+      <div class="card" style="gap:10px">
+        <div class="card-title">WOW Effekte</div>
+        <div class="effects-grid" id="effectsGridWow">
+          <div class="effect-btn active" data-id="0"  onclick="selectEffect(0)"><div class="icon">⬛</div>Solid</div>
+          <div class="effect-btn" data-id="1"  onclick="selectEffect(1)"><div class="icon">🌈</div>Rainbow</div>
+          <div class="effect-btn" data-id="2"  onclick="selectEffect(2)"><div class="icon">💫</div>Breathe</div>
+          <div class="effect-btn" data-id="3"  onclick="selectEffect(3)"><div class="icon">☄️</div>Meteor</div>
+          <div class="effect-btn" data-id="4"  onclick="selectEffect(4)"><div class="icon">🔥</div>Fire</div>
+          <div class="effect-btn" data-id="5"  onclick="selectEffect(5)"><div class="icon">✨</div>Twinkle</div>
+          <div class="effect-btn" data-id="6"  onclick="selectEffect(6)"><div class="icon">🌊</div>Wave</div>
+          <div class="effect-btn" data-id="7"  onclick="selectEffect(7)"><div class="icon">🎊</div>Konfetti</div>
+          <div class="effect-btn" data-id="8"  onclick="selectEffect(8)"><div class="icon">🚗</div>Larson</div>
+          <div class="effect-btn" data-id="9"  onclick="selectEffect(9)"><div class="icon">🔮</div>Plasma</div>
+          <div class="effect-btn" data-id="10" onclick="selectEffect(10)"><div class="icon">👁️</div>Cylon</div>
+          <div class="effect-btn" data-id="11" onclick="selectEffect(11)"><div class="icon">🤹</div>Juggle</div>
+          <div class="effect-btn" data-id="12" onclick="selectEffect(12)"><div class="icon">🥁</div>BPM</div>
+          <div class="effect-btn" data-id="13" onclick="selectEffect(13)"><div class="icon">📡</div>Noise</div>
+          <div class="effect-btn" data-id="14" onclick="selectEffect(14)"><div class="icon">🌌</div>Aurora</div>
+          <div class="effect-btn" data-id="15" onclick="selectEffect(15)"><div class="icon">💚</div>Matrix</div>
+          <div class="effect-btn" data-id="16" onclick="selectEffect(16)"><div class="icon">🎆</div>Fireworks</div>
+          <div class="effect-btn" data-id="17" onclick="selectEffect(17)"><div class="icon">🌩️</div>Lightning</div>
+          <div class="effect-btn" data-id="18" onclick="selectEffect(18)"><div class="icon">❤️</div>Heartbeat</div>
+          <div class="effect-btn" data-id="19" onclick="selectEffect(19)"><div class="icon">💧</div>Ripple</div>
+          <div class="effect-btn" data-id="20" onclick="selectEffect(20)"><div class="icon">↔️</div>DualMeteor</div>
+          <div class="effect-btn" data-id="21" onclick="selectEffect(21)"><div class="icon">💥</div>Explosion</div>
+          <div class="effect-btn" data-id="22" onclick="selectEffect(22)"><div class="icon">〰️</div>Sinelon</div>
+          <div class="effect-btn" data-id="23" onclick="selectEffect(23)"><div class="icon">🌈</div>RainbowMeteor</div>
+          <div class="effect-btn" data-id="24" onclick="selectEffect(24)"><div class="icon">🌀</div>Warp</div>
+          <div class="effect-btn" data-id="25" onclick="selectEffect(25)"><div class="icon">⭐</div>Starfield</div>
+          <div class="effect-btn" data-id="26" onclick="selectEffect(26)"><div class="icon">💡</div>NeonPulse</div>
+          <div class="effect-btn" data-id="27" onclick="selectEffect(27)"><div class="icon">🌀</div>GalaxySwirl</div>
+          <div class="effect-btn" data-id="28" onclick="selectEffect(28)"><div class="icon">🌋</div>Lava</div>
+          <div class="effect-btn" data-id="29" onclick="selectEffect(29)"><div class="icon">🧊</div>IceCave</div>
+          <div class="effect-btn" data-id="30" onclick="selectEffect(30)"><div class="icon">🌀</div>Vortex</div>
+          <div class="effect-btn" data-id="31" onclick="selectEffect(31)"><div class="icon">✦</div>SparkleTrail</div>
+          <div class="effect-btn" data-id="32" onclick="selectEffect(32)"><div class="icon">⛈️</div>Thunderstorm</div>
+          <div class="effect-btn" data-id="33" onclick="selectEffect(33)"><div class="icon">🧬</div>DNA</div>
+          <div class="effect-btn" data-id="34" onclick="selectEffect(34)"><div class="icon">🏖️</div>Pacifica</div>
+          <div class="effect-btn" data-id="35" onclick="selectEffect(35)"><div class="icon">🌅</div>Sunrise</div>
+          <div class="effect-btn" data-id="36" onclick="selectEffect(36)"><div class="icon">🌧️</div>Waterfall</div>
+          <div class="effect-btn" data-id="37" onclick="selectEffect(37)"><div class="icon">🚔</div>Police</div>
+          <div class="effect-btn" data-id="38" onclick="selectEffect(38)"><div class="icon">⚡</div>Strobe</div>
+          <div class="effect-btn" data-id="39" onclick="selectEffect(39)"><div class="icon">💎</div>Glitter</div>
+          <div class="effect-btn" data-id="40" onclick="selectEffect(40)"><div class="icon">🕺</div>Disco</div>
+          <div class="effect-btn" data-id="41" onclick="selectEffect(41)"><div class="icon">🔆</div>NeonSign</div>
+          <div class="effect-btn" data-id="42" onclick="selectEffect(42)"><div class="icon">🌊</div>MagmaFlow</div>
+          <div class="effect-btn" data-id="43" onclick="selectEffect(43)"><div class="icon">🌿</div>NorthernLights</div>
+          <div class="effect-btn" data-id="44" onclick="selectEffect(44)"><div class="icon">🔺</div>Prism</div>
+          <div class="effect-btn" data-id="45" onclick="selectEffect(45)"><div class="icon">🕳️</div>BlackHole</div>
+          <div class="effect-btn" data-id="46" onclick="selectEffect(46)"><div class="icon">🔷</div>CrystalPulse</div>
+          <div class="effect-btn" data-id="47" onclick="selectEffect(47)"><div class="icon">💫</div>Supernova</div>
+          <div class="effect-btn" data-id="48" onclick="selectEffect(48)"><div class="icon">⚛️</div>QuantumFlux</div>
+          <div class="effect-btn" data-id="49" onclick="selectEffect(49)"><div class="icon">🌫️</div>Nebula</div>
+          <div class="effect-btn" data-id="50" onclick="selectEffect(50)"><div class="icon">☄️</div>CometShower</div>
+          <div class="effect-btn" data-id="51" onclick="selectEffect(51)"><div class="icon">🌪️</div>VortexWarp</div>
+          <div class="effect-btn" data-id="52" onclick="selectEffect(52)"><div class="icon">📻</div>Pulsar</div>
+          <div class="effect-btn" data-id="53" onclick="selectEffect(53)"><div class="icon">☀️</div>SolarFlare</div>
+          <div class="effect-btn" data-id="54" onclick="selectEffect(54)"><div class="icon">🚀</div>Hyperspace</div>
+          <div class="effect-btn" data-id="55" onclick="selectEffect(55)"><div class="icon">⚡</div>EnergyBall</div>
+          <div class="effect-btn" data-id="56" onclick="selectEffect(56)"><div class="icon">🌊</div>WaveCrash</div>
+          <div class="effect-btn" data-id="57" onclick="selectEffect(57)"><div class="icon">🔥</div>Fireplace</div>
+          <div class="effect-btn" data-id="58" onclick="selectEffect(58)"><div class="icon">🌀</div>ColorTornado</div>
+          <div class="effect-btn" data-id="59" onclick="selectEffect(59)"><div class="icon">🍭</div>CandyPop</div>
+          <div class="effect-btn" data-id="60" onclick="selectEffect(60)"><div class="icon">📺</div>GlitchArt</div>
+          <div class="effect-btn" data-id="61" onclick="selectEffect(61)"><div class="icon">💨</div>Comet2</div>
+          <div class="effect-btn" data-id="62" onclick="selectEffect(62)"><div class="icon">⚡</div>RetroZap</div>
+          <div class="effect-btn" data-id="63" onclick="selectEffect(63)"><div class="icon">🔲</div>CyberGrid</div>
+          <div class="effect-btn" data-id="64" onclick="selectEffect(64)"><div class="icon">📊</div>Spectrum</div>
+          <div class="effect-btn" data-id="65" onclick="selectEffect(65)"><div class="icon">🌊</div>OceanDepth</div>
+          <div class="effect-btn" data-id="66" onclick="selectEffect(66)"><div class="icon">🫧</div>BubbleUp</div>
+          <div class="effect-btn" data-id="67" onclick="selectEffect(67)"><div class="icon">🔴</div>LaserShow</div>
+          <div class="effect-btn" data-id="68" onclick="selectEffect(68)"><div class="icon">💠</div>CrystalGrowth</div>
+          <div class="effect-btn" data-id="69" onclick="selectEffect(69)"><div class="icon">⚡</div>TeslaCoil</div>
+          <div class="effect-btn" data-id="70" onclick="selectEffect(70)"><div class="icon">🎵</div>SoundWave</div>
+          <div class="effect-btn" data-id="71" onclick="selectEffect(71)"><div class="icon">🏳️‍🌈</div>Pride</div>
+          <div class="effect-btn" data-id="72" onclick="selectEffect(72)"><div class="icon">🎞️</div>Parallax</div>
+          <div class="effect-btn" data-id="73" onclick="selectEffect(73)"><div class="icon">💣</div>Explosion2</div>
+          <div class="effect-btn" data-id="74" onclick="selectEffect(74)"><div class="icon">💾</div>DataStream</div>
+          <div class="effect-btn" data-id="75" onclick="selectEffect(75)"><div class="icon">🌧️</div>NeonRain</div>
+          <div class="effect-btn" data-id="76" onclick="selectEffect(76)"><div class="icon">🌫️</div>HoloFog</div>
+          <div class="effect-btn" data-id="77" onclick="selectEffect(77)"><div class="icon">🏎️</div>PixelRace</div>
+          <div class="effect-btn" data-id="78" onclick="selectEffect(78)"><div class="icon">🌋</div>Earthquake</div>
+          <div class="effect-btn" data-id="79" onclick="selectEffect(79)"><div class="icon">🌌</div>CosmicDust</div>
+          <div class="effect-btn" data-id="80" onclick="selectEffect(80)"><div class="icon">🕳️</div>TimeTunnel</div>
+          <div class="effect-btn" data-id="81" onclick="selectEffect(81)"><div class="icon">🪞</div>MirrorWave</div>
+          <div class="effect-btn" data-id="82" onclick="selectEffect(82)"><div class="icon">💍</div>DiamondSpark</div>
+          <div class="effect-btn" data-id="83" onclick="selectEffect(83)"><div class="icon">☢️</div>Radioactive</div>
+          <div class="effect-btn" data-id="84" onclick="selectEffect(84)"><div class="icon">🌈</div>AcidTrip</div>
+          <div class="effect-btn" data-id="85" onclick="selectEffect(85)"><div class="icon">💥</div>StarBurst</div>
+          <div class="effect-btn" data-id="86" onclick="selectEffect(86)"><div class="icon">🌑</div>EclipseRing</div>
+          <div class="effect-btn" data-id="87" onclick="selectEffect(87)"><div class="icon">🌀</div>SpiralGalaxy</div>
+          <div class="effect-btn" data-id="88" onclick="selectEffect(88)"><div class="icon">☢️</div>NuclearCore</div>
+          <div class="effect-btn" data-id="89" onclick="selectEffect(89)"><div class="icon">🧠</div>MindBender</div>
+          <div class="effect-btn" data-id="90" onclick="selectEffect(90)"><div class="icon">💻</div>DigitalRain</div>
+          <div class="effect-btn" data-id="91" onclick="selectEffect(91)"><div class="icon">🌀</div>ChaosField</div>
+          <div class="effect-btn" data-id="92" onclick="selectEffect(92)"><div class="icon">🛸</div>SpaceDrift</div>
+          <div class="effect-btn" data-id="93" onclick="selectEffect(93)"><div class="icon">🌑</div>VoidPulse</div>
+          <div class="effect-btn" data-id="94" onclick="selectEffect(94)"><div class="icon">🚀</div>PhotonTorpedo</div>
+          <div class="effect-btn" data-id="95" onclick="selectEffect(95)"><div class="icon">💥</div>ShockWave</div>
+          <div class="effect-btn" data-id="96" onclick="selectEffect(96)"><div class="icon">🎨</div>ChromaticAberration</div>
+          <div class="effect-btn" data-id="97" onclick="selectEffect(97)"><div class="icon">🕳️</div>WormHole</div>
+          <div class="effect-btn" data-id="98" onclick="selectEffect(98)"><div class="icon">☢️</div>XRayPulse</div>
+          <div class="effect-btn" data-id="99" onclick="selectEffect(99)"><div class="icon">🌀</div>UltimateChaos</div>
+        </div>
       </div>
     </div>
+
+    <!-- Auto Effekte -->
+    <div class="effect-tab-panel" id="etab-auto">
+      <div class="card" style="gap:10px">
+        <div class="card-title">🚗 Auto Effekte</div>
+        <div class="effects-grid">
+          <div class="effect-btn" data-id="100" onclick="selectEffect(100)"><div class="icon">⬜</div>SteadyWhite</div>
+          <div class="effect-btn" data-id="101" onclick="selectEffect(101)"><div class="icon">💡</div>DrivingPulse</div>
+          <div class="effect-btn" data-id="102" onclick="selectEffect(102)"><div class="icon">➡️</div>SpeedLines</div>
+          <div class="effect-btn" data-id="103" onclick="selectEffect(103)"><div class="icon">🔴</div>RPMBeat</div>
+          <div class="effect-btn" data-id="104" onclick="selectEffect(104)"><div class="icon">📊</div>TachoPulse</div>
+          <div class="effect-btn" data-id="105" onclick="selectEffect(105)"><div class="icon">🌃</div>NightDrive</div>
+          <div class="effect-btn" data-id="106" onclick="selectEffect(106)"><div class="icon">🛣️</div>HighwayStripes</div>
+          <div class="effect-btn" data-id="107" onclick="selectEffect(107)"><div class="icon">🔴</div>TailLight</div>
+          <div class="effect-btn" data-id="108" onclick="selectEffect(108)"><div class="icon">🟡</div>TurnSignal</div>
+          <div class="effect-btn" data-id="109" onclick="selectEffect(109)"><div class="icon">🛑</div>BrakeLight</div>
+          <div class="effect-btn" data-id="110" onclick="selectEffect(110)"><div class="icon">🚗</div>NightRider</div>
+          <div class="effect-btn" data-id="111" onclick="selectEffect(111)"><div class="icon">✨</div>UnderbodyGlow</div>
+          <div class="effect-btn" data-id="112" onclick="selectEffect(112)"><div class="icon">🌟</div>NeonUndercar</div>
+          <div class="effect-btn" data-id="113" onclick="selectEffect(113)"><div class="icon">⚡</div>SpeedoGlow</div>
+          <div class="effect-btn" data-id="114" onclick="selectEffect(114)"><div class="icon">💨</div>DriftSmoke</div>
+          <div class="effect-btn" data-id="115" onclick="selectEffect(115)"><div class="icon">💧</div>NitroBoost</div>
+          <div class="effect-btn" data-id="116" onclick="selectEffect(116)"><div class="icon">🔥</div>ExhaustFlame</div>
+          <div class="effect-btn" data-id="117" onclick="selectEffect(117)"><div class="icon">🚀</div>Warp9</div>
+          <div class="effect-btn" data-id="118" onclick="selectEffect(118)"><div class="icon">🔲</div>LaserGrid</div>
+          <div class="effect-btn" data-id="119" onclick="selectEffect(119)"><div class="icon">🏁</div>CarbonFiber</div>
+          <div class="effect-btn" data-id="120" onclick="selectEffect(120)"><div class="icon">🏎️</div>GTRaceMode</div>
+          <div class="effect-btn" data-id="121" onclick="selectEffect(121)"><div class="icon">🌀</div>DriftKing</div>
+          <div class="effect-btn" data-id="122" onclick="selectEffect(122)"><div class="icon">🚔</div>NightPatrol</div>
+          <div class="effect-btn" data-id="123" onclick="selectEffect(123)"><div class="icon">🌙</div>Backlight</div>
+          <div class="effect-btn" data-id="124" onclick="selectEffect(124)"><div class="icon">💨</div>StreetRacer</div>
+          <div class="effect-btn" data-id="125" onclick="selectEffect(125)"><div class="icon">🌀</div>TurboGlow</div>
+          <div class="effect-btn" data-id="126" onclick="selectEffect(126)"><div class="icon">💨</div>BurnoutSmoke</div>
+          <div class="effect-btn" data-id="127" onclick="selectEffect(127)"><div class="icon">🏁</div>DragRace</div>
+          <div class="effect-btn" data-id="128" onclick="selectEffect(128)"><div class="icon">🌆</div>CityLights</div>
+          <div class="effect-btn" data-id="129" onclick="selectEffect(129)"><div class="icon">🛣️</div>MotorwayLamp</div>
+          <div class="effect-btn" data-id="130" onclick="selectEffect(130)"><div class="icon">🔴</div>RearFog</div>
+          <div class="effect-btn" data-id="131" onclick="selectEffect(131)"><div class="icon">🏎️</div>RacingStripes</div>
+          <div class="effect-btn" data-id="132" onclick="selectEffect(132)"><div class="icon">📊</div>Speedometer</div>
+          <div class="effect-btn" data-id="133" onclick="selectEffect(133)"><div class="icon">🟡</div>CargoHold</div>
+          <div class="effect-btn" data-id="134" onclick="selectEffect(134)"><div class="icon">🟠</div>SafetyOrange</div>
+          <div class="effect-btn" data-id="135" onclick="selectEffect(135)"><div class="icon">🔵</div>ICE Blue</div>
+          <div class="effect-btn" data-id="136" onclick="selectEffect(136)"><div class="icon">⭕</div>HaloRing</div>
+          <div class="effect-btn" data-id="137" onclick="selectEffect(137)"><div class="icon">🔴</div>AngryRed</div>
+          <div class="effect-btn" data-id="138" onclick="selectEffect(138)"><div class="icon">🔵</div>CoolBlue</div>
+          <div class="effect-btn" data-id="139" onclick="selectEffect(139)"><div class="icon">🟣</div>PurpleNight</div>
+          <div class="effect-btn" data-id="140" onclick="selectEffect(140)"><div class="icon">🟡</div>GoldFlash</div>
+          <div class="effect-btn" data-id="141" onclick="selectEffect(141)"><div class="icon">⚙️</div>SteelGray</div>
+          <div class="effect-btn" data-id="142" onclick="selectEffect(142)"><div class="icon">🚨</div>EmergencyFlash</div>
+          <div class="effect-btn" data-id="143" onclick="selectEffect(143)"><div class="icon">☀️</div>DaytimeRunning</div>
+          <div class="effect-btn" data-id="144" onclick="selectEffect(144)"><div class="icon">🛣️</div>CruiseControl</div>
+          <div class="effect-btn" data-id="145" onclick="selectEffect(145)"><div class="icon">🌡️</div>OverheatWarning</div>
+          <div class="effect-btn" data-id="146" onclick="selectEffect(146)"><div class="icon">💥</div>FullThrottle</div>
+          <div class="effect-btn" data-id="147" onclick="selectEffect(147)"><div class="icon">😴</div>SilentCruise</div>
+          <div class="effect-btn" data-id="148" onclick="selectEffect(148)"><div class="icon">🏎️</div>SportMode</div>
+          <div class="effect-btn" data-id="149" onclick="selectEffect(149)"><div class="icon">🌐</div>GrandTourer</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Speed -->
     <div class="card">
       <div class="card-title">Geschwindigkeit</div>
       <div class="slider-row">
@@ -370,6 +503,20 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:24px; h
         <input type="range" id="speed-slider" min="1" max="255" value="128" oninput="updateSpeed(this.value)" onchange="sendEffect()">
       </div>
     </div>
+
+    <!-- Restart / Shutdown -->
+    <div class="card">
+      <div class="card-title">⚙️ Gerät</div>
+      <div class="danger-row">
+        <button class="danger-btn btn-restart" onclick="restartESP()">
+          <span class="danger-icon">🔄</span>Neustart
+        </button>
+        <button class="danger-btn btn-shutdown" onclick="shutdownESP()">
+          <span class="danger-icon">💤</span>Ausschalten
+        </button>
+      </div>
+    </div>
+
   </div>
 
   <!-- PAGE: Presets -->
@@ -864,7 +1011,25 @@ function updateInfoPanel() {
 }
 
 // ── UI helpers ───────────────────────────────────────
-function switchTab(name) {
+function switchEffectTab(name) {
+  document.querySelectorAll('.effect-tab-panel').forEach(p => p.classList.toggle('active', p.id==='etab-'+name));
+  // update tab highlight
+  const tabs = document.querySelectorAll('#page-effects .tab');
+  tabs.forEach((t,i) => t.classList.toggle('active', ['wow','auto'][i]===name));
+}
+
+function restartESP() {
+  if (!isConnected) { showToast('⚠️ Nicht verbunden'); return; }
+  showToast('🔄 ESP startet neu...');
+  sendBLE(JSON.stringify({cmd:'restart'}));
+  setTimeout(() => setConnected(false), 1000);
+}
+
+function shutdownESP() {
+  if (!isConnected) { showToast('⚠️ Nicht verbunden'); return; }
+  showToast('💤 ESP wird ausgeschaltet...');
+  sendBLE(JSON.stringify({cmd:'shutdown'}));
+}
   const names = ['hsv','rgb','palette'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id==='tab-'+name));
