@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LumaControl">
+<meta name="theme-color" content="#080810">
+
+<!-- Apple Touch Icon (wird als App-Icon verwendet) -->
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<title>LumaControl</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080810;
+    --surface: #0f0f1a;
+    --surface2: #161628;
+    --border: rgba(255,255,255,0.07);
+    --accent: #7c5cfc;
+    --accent2: #fc5c7d;
+    --text: #f0f0ff;
+    --muted: rgba(240,240,255,0.4);
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    overflow-x: hidden;
+    padding-bottom: calc(var(--safe-bottom) + 90px);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(124,92,252,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 110%, rgba(252,92,125,0.1) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: calc(var(--safe-top) + 16px) 24px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(8,8,16,0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .ble-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .ble-btn.connected { border-color: rgba(124,252,124,0.4); color: #7cfc7c; background: rgba(124,252,124,0.08); }
+  .ble-btn .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); transition: all 0.3s; }
+  .ble-btn.connected .dot { background: #7cfc7c; box-shadow: 0 0 8px #7cfc7c; animation: pulse-dot 2s infinite; }
+  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ─── Content ─── */
+  .content { position: relative; z-index: 1; padding: 20px 16px; display: flex; flex-direction: column; gap: 16px; }
+
+  /* ─── Power ─── */
+  .power-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 22px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 20px;
+  }
+  .power-label { font-size: 18px; font-weight: 700; }
+  .power-label span { font-size: 13px; font-weight: 400; color: var(--muted); display: block; margin-top: 2px; font-family: 'DM Mono', monospace; }
+  .toggle { width: 58px; height: 32px; background: var(--surface2); border-radius: 16px; border: 1px solid var(--border); position: relative; cursor: pointer; transition: background 0.3s; }
+  .toggle.on { background: var(--accent); border-color: var(--accent); }
+  .toggle::after { content:''; position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%; background:white; transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 2px 6px rgba(0,0,0,0.3); }
+  .toggle.on::after { transform:translateX(26px); }
+
+  /* ─── Cards ─── */
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:20px 22px; display:flex; flex-direction:column; gap:16px; }
+  .card-title { font-size:12px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); font-family:'DM Mono',monospace; }
+
+  /* ─── Color Preview ─── */
+  .color-preview { width:100%; height:80px; border-radius:14px; border:1px solid var(--border); transition:background 0.2s; position:relative; overflow:hidden; }
+  .color-preview::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.1) 0%,transparent 50%); }
+
+  /* ─── Sliders ─── */
+  .slider-row { display:flex; flex-direction:column; gap:8px; }
+  .slider-header { display:flex; justify-content:space-between; align-items:center; }
+  .slider-label { font-size:14px; font-weight:600; }
+  .slider-value { font-family:'DM Mono',monospace; font-size:13px; color:var(--muted); min-width:36px; text-align:right; }
+
+  input[type=range] { -webkit-appearance:none; width:100%; height:6px; border-radius:3px; outline:none; cursor:pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:24px; height:24px; border-radius:50%; background:white; border:2px solid rgba(255,255,255,0.3); box-shadow:0 2px 12px rgba(0,0,0,0.4); cursor:pointer; }
+  #hue-slider { background:linear-gradient(to right,hsl(0,100%,50%),hsl(30,100%,50%),hsl(60,100%,50%),hsl(90,100%,50%),hsl(120,100%,50%),hsl(150,100%,50%),hsl(180,100%,50%),hsl(210,100%,50%),hsl(240,100%,50%),hsl(270,100%,50%),hsl(300,100%,50%),hsl(330,100%,50%),hsl(360,100%,50%)); }
+  #brightness-slider { background:linear-gradient(to right,#000,#fff); }
+  #speed-slider { background:linear-gradient(to right,var(--surface2),var(--accent)); }
+  #r-slider { background:linear-gradient(to right,#000,#ff0000); }
+  #g-slider { background:linear-gradient(to right,#000,#00ff00); }
+  #b-slider { background:linear-gradient(to right,#000,#0000ff); }
+
+  /* ─── Tabs ─── */
+  .tabs { display:flex; gap:6px; background:var(--surface2); padding:4px; border-radius:12px; border:1px solid var(--border); }
+  .tab { flex:1; padding:8px 4px; text-align:center; font-size:12px; font-weight:700; letter-spacing:0.5px; border-radius:8px; cursor:pointer; color:var(--muted); transition:all 0.2s; }
+  .tab.active { background:var(--surface); color:var(--text); border:1px solid var(--border); }
+  .tab-panel { display:none; flex-direction:column; gap:14px; }
+  .tab-panel.active { display:flex; }
+
+  /* ─── Effects Grid ─── */
+  .effects-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .effect-btn { aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; background:var(--surface2); border:1.5px solid var(--border); border-radius:14px; cursor:pointer; transition:all 0.2s; color:var(--muted); font-size:11px; font-weight:600; letter-spacing:0.3px; text-align:center; padding:8px 4px; position:relative; overflow:hidden; }
+  .effect-btn .icon { font-size:22px; line-height:1; }
+  .effect-btn.active { border-color:var(--accent); color:var(--text); background:rgba(124,92,252,0.15); box-shadow:0 0 20px rgba(124,92,252,0.2); }
+  .effect-btn::before { content:''; position:absolute; inset:0; opacity:0; transition:opacity 0.2s; background:radial-gradient(circle at center,rgba(255,255,255,0.1) 0%,transparent 70%); }
+  .effect-btn:active::before { opacity:1; }
+
+  /* ─── Bottom Nav ─── */
+  .bottom-nav { position:fixed; bottom:0; left:0; right:0; z-index:100; display:flex; padding:12px 24px calc(var(--safe-bottom) + 12px); background:rgba(8,8,16,0.9); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-top:1px solid var(--border); gap:0; }
+  .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:6px 0; color:var(--muted); font-size:10px; font-weight:600; letter-spacing:0.5px; transition:color 0.2s; }
+  .nav-item .nav-icon { font-size:20px; }
+  .nav-item.active { color:var(--text); }
+  .nav-item.active .nav-icon { filter:drop-shadow(0 0 8px var(--accent)); }
+
+  /* ─── Pages ─── */
+  .page { display:none; }
+  .page.active { display:flex; flex-direction:column; gap:16px; }
+
+  /* ─── Presets ─── */
+  .preset-list { display:flex; flex-direction:column; gap:10px; }
+  .preset-item { display:flex; align-items:center; gap:14px; padding:14px 16px; background:var(--surface2); border-radius:14px; border:1px solid var(--border); cursor:pointer; transition:all 0.2s; }
+  .preset-item:active { transform:scale(0.98); }
+  .preset-dot { width:36px; height:36px; border-radius:10px; flex-shrink:0; }
+  .preset-info { flex:1; }
+  .preset-name { font-size:15px; font-weight:600; }
+  .preset-desc { font-size:12px; color:var(--muted); margin-top:2px; }
+  .preset-arrow { color:var(--muted); font-size:18px; }
+
+  /* ─── Install Banner ─── */
+  .install-banner {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, rgba(124,92,252,0.2), rgba(252,92,125,0.15));
+    border: 1px solid rgba(124,92,252,0.3);
+    border-radius: 16px;
+    cursor: pointer;
+  }
+  .install-banner.visible { display: flex; }
+  .install-banner-icon { font-size: 28px; }
+  .install-banner-text { flex: 1; }
+  .install-banner-title { font-size: 14px; font-weight: 700; }
+  .install-banner-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .install-banner-close { color: var(--muted); font-size: 20px; padding: 4px; }
+
+  /* ─── Toast ─── */
+  .toast { position:fixed; bottom:calc(var(--safe-bottom) + 100px); left:50%; transform:translateX(-50%) translateY(20px); background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:10px 20px; border-radius:20px; font-size:13px; font-family:'DM Mono',monospace; opacity:0; transition:all 0.3s; z-index:200; white-space:nowrap; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ─── Overlay ─── */
+  .disabled-overlay { position:fixed; inset:0; z-index:50; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; background:rgba(8,8,16,0.85); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); pointer-events:none; opacity:0; transition:opacity 0.4s; }
+  .disabled-overlay.visible { opacity:1; pointer-events:all; }
+  .disco-icon { font-size:64px; animation:float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+  .disco-title { font-size:28px; font-weight:800; text-align:center; }
+  .disco-sub { font-size:14px; color:var(--muted); text-align:center; max-width:260px; line-height:1.6; }
+  .connect-big-btn { margin-top:8px; padding:16px 36px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border:none; border-radius:50px; color:white; font-family:'Syne',sans-serif; font-size:16px; font-weight:700; cursor:pointer; box-shadow:0 8px 30px rgba(124,92,252,0.4); transition:transform 0.2s; }
+  .connect-big-btn:active { transform:scale(0.96); }
+
+  /* ─── Settings Page ─── */
+  .setting-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:4px 0; }
+  .setting-info { flex:1; }
+  .setting-label { font-size:15px; font-weight:600; }
+  .setting-desc { font-size:12px; color:var(--muted); margin-top:2px; }
+  .number-input-wrap { display:flex; align-items:center; gap:12px; background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:6px 10px; }
+  .num-btn { width:30px; height:30px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
+  .num-btn:active { background:var(--accent); border-color:var(--accent); }
+  .num-val { font-family:'DM Mono',monospace; font-size:16px; font-weight:600; min-width:40px; text-align:center; }
+  .setting-info-box { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:10px 14px; font-family:'DM Mono',monospace; font-size:12px; color:var(--muted); text-align:center; }
+  .apply-btn { width:100%; padding:14px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border:none; border-radius:14px; color:white; font-family:'Syne',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:transform 0.15s; box-shadow:0 4px 20px rgba(124,92,252,0.3); }
+  .apply-btn:active { transform:scale(0.98); }
+  .info-list { display:flex; flex-direction:column; gap:0; }
+  .info-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); }
+  .info-row:last-child { border-bottom:none; }
+  .info-key { font-size:13px; color:var(--muted); }
+  .info-val { font-family:'DM Mono',monospace; font-size:13px; font-weight:500; }
+
+
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">LumaControl</div>
+  <button class="ble-btn" id="bleBtn" onclick="toggleBLE()">
+    <div class="dot"></div>
+    <span id="bleBtnText">Verbinden</span>
+  </button>
+</div>
+
+<div class="disabled-overlay visible" id="overlay">
+  <div class="disco-icon">💡</div>
+  <div class="disco-title">LumaControl</div>
+  <div class="disco-sub">Verbinde dich mit deinem ESP32 LED Controller über Bluetooth</div>
+  <button class="connect-big-btn" onclick="toggleBLE()">Jetzt verbinden</button>
+  <div style="font-size:12px;color:var(--muted);text-align:center;max-width:280px;line-height:1.5;">
+    Benötigt <strong>Bluefy Browser</strong> (App Store)<br>oder Chrome/Edge auf Android
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- Install Banner (iOS Safari Hinweis) -->
+  <div class="install-banner" id="installBanner" onclick="dismissInstall()">
+    <div class="install-banner-icon">📲</div>
+    <div class="install-banner-text">
+      <div class="install-banner-title">Als App installieren</div>
+      <div class="install-banner-sub">Teilen → „Zum Home-Bildschirm"</div>
+    </div>
+    <div class="install-banner-close" onclick="dismissInstall()">✕</div>
+  </div>
+
+  <!-- PAGE: Steuern -->
+  <div class="page active" id="page-control">
+    <div class="power-row">
+      <div class="power-label">LEDs<span id="powerStatus">Eingeschaltet</span></div>
+      <div class="toggle on" id="powerToggle" onclick="togglePower()"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Helligkeit</div>
+      <div class="slider-row">
+        <div class="slider-header">
+          <span class="slider-label">☀️ Intensität</span>
+          <span class="slider-value" id="briVal">50%</span>
+        </div>
+        <input type="range" id="brightness-slider" min="0" max="255" value="128"
+          oninput="updateBrightness(this.value)" onchange="sendBrightness(this.value)">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Farbe</div>
+      <div class="color-preview" id="colorPreview"></div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('hsv')">HSV</div>
+        <div class="tab" onclick="switchTab('rgb')">RGB</div>
+        <div class="tab" onclick="switchTab('palette')">Palette</div>
+      </div>
+      <div class="tab-panel active" id="tab-hsv">
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">🌈 Farbton</span><span class="slider-value" id="hueVal">0°</span></div>
+          <input type="range" id="hue-slider" min="0" max="255" value="0" oninput="updateHSV()" onchange="sendColor()">
+        </div>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">🎨 Sättigung</span><span class="slider-value" id="satVal">100%</span></div>
+          <input type="range" id="sat-slider" min="0" max="255" value="255" oninput="updateHSV()" onchange="sendColor()">
+        </div>
+      </div>
+      <div class="tab-panel" id="tab-rgb">
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">🔴 Rot</span><span class="slider-value" id="rVal">255</span></div>
+          <input type="range" id="r-slider" min="0" max="255" value="255" oninput="updateRGB()" onchange="sendColorRGB()">
+        </div>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">🟢 Grün</span><span class="slider-value" id="gVal">0</span></div>
+          <input type="range" id="g-slider" min="0" max="255" value="0" oninput="updateRGB()" onchange="sendColorRGB()">
+        </div>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">🔵 Blau</span><span class="slider-value" id="bVal">0</span></div>
+          <input type="range" id="b-slider" min="0" max="255" value="0" oninput="updateRGB()" onchange="sendColorRGB()">
+        </div>
+      </div>
+      <div class="tab-panel" id="tab-palette">
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;">
+          <div class="palette-swatch" style="background:#ff4444" onclick="setPalette(255,68,68)"></div>
+          <div class="palette-swatch" style="background:#ff8800" onclick="setPalette(255,136,0)"></div>
+          <div class="palette-swatch" style="background:#ffdd00" onclick="setPalette(255,221,0)"></div>
+          <div class="palette-swatch" style="background:#44ff44" onclick="setPalette(68,255,68)"></div>
+          <div class="palette-swatch" style="background:#0088ff" onclick="setPalette(0,136,255)"></div>
+          <div class="palette-swatch" style="background:#aa44ff" onclick="setPalette(170,68,255)"></div>
+          <div class="palette-swatch" style="background:#ff44aa" onclick="setPalette(255,68,170)"></div>
+          <div class="palette-swatch" style="background:#00ffcc" onclick="setPalette(0,255,204)"></div>
+          <div class="palette-swatch" style="background:#ffffff" onclick="setPalette(255,255,255)"></div>
+          <div class="palette-swatch" style="background:#ffaacc" onclick="setPalette(255,170,204)"></div>
+          <div class="palette-swatch" style="background:#aaffee" onclick="setPalette(170,255,238)"></div>
+          <div class="palette-swatch" style="background:#ff6622" onclick="setPalette(255,102,34)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Effekte -->
+  <div class="page" id="page-effects">
+    <div class="card">
+      <div class="card-title">Effekte</div>
+      <div class="effects-grid">
+        <div class="effect-btn active" data-id="0" onclick="selectEffect(0)"><div class="icon">⬛</div>Solid</div>
+        <div class="effect-btn" data-id="1" onclick="selectEffect(1)"><div class="icon">🌈</div>Rainbow</div>
+        <div class="effect-btn" data-id="2" onclick="selectEffect(2)"><div class="icon">💫</div>Pulse</div>
+        <div class="effect-btn" data-id="3" onclick="selectEffect(3)"><div class="icon">☄️</div>Meteor</div>
+        <div class="effect-btn" data-id="4" onclick="selectEffect(4)"><div class="icon">🔥</div>Fire</div>
+        <div class="effect-btn" data-id="5" onclick="selectEffect(5)"><div class="icon">✨</div>Twinkle</div>
+        <div class="effect-btn" data-id="6" onclick="selectEffect(6)"><div class="icon">🌊</div>Wave</div>
+        <div class="effect-btn" data-id="7" onclick="selectEffect(7)"><div class="icon">🎊</div>Konfetti</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Geschwindigkeit</div>
+      <div class="slider-row">
+        <div class="slider-header"><span class="slider-label">⚡ Speed</span><span class="slider-value" id="speedVal">50%</span></div>
+        <input type="range" id="speed-slider" min="1" max="255" value="128" oninput="updateSpeed(this.value)" onchange="sendEffect()">
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Presets -->
+  <div class="page" id="page-presets">
+    <div class="card">
+      <div class="card-title">Schnell-Presets</div>
+      <div class="preset-list">
+        <div class="preset-item" onclick="applyPreset('sunset')">
+          <div class="preset-dot" style="background:linear-gradient(135deg,#ff6b35,#f7c948)"></div>
+          <div class="preset-info"><div class="preset-name">Sunset Lounge</div><div class="preset-desc">Warme Orange-Töne, Pulse-Effekt</div></div>
+          <div class="preset-arrow">›</div>
+        </div>
+        <div class="preset-item" onclick="applyPreset('ocean')">
+          <div class="preset-dot" style="background:linear-gradient(135deg,#0575e6,#021b79)"></div>
+          <div class="preset-info"><div class="preset-name">Deep Ocean</div><div class="preset-desc">Blaue Wellen, Wave-Effekt</div></div>
+          <div class="preset-arrow">›</div>
+        </div>
+        <div class="preset-item" onclick="applyPreset('party')">
+          <div class="preset-dot" style="background:linear-gradient(135deg,#fc00ff,#00dbde)"></div>
+          <div class="preset-info"><div class="preset-name">Party Mode</div><div class="preset-desc">Schneller Rainbow, max Speed</div></div>
+          <div class="preset-arrow">›</div>
+        </div>
+        <div class="preset-item" onclick="applyPreset('forest')">
+          <div class="preset-dot" style="background:linear-gradient(135deg,#11998e,#38ef7d)"></div>
+          <div class="preset-info"><div class="preset-name">Forest Night</div><div class="preset-desc">Grünes Twinkle, gedimmt</div></div>
+          <div class="preset-arrow">›</div>
+        </div>
+        <div class="preset-item" onclick="applyPreset('fire')">
+          <div class="preset-dot" style="background:linear-gradient(135deg,#f12711,#f5af19)"></div>
+          <div class="preset-info"><div class="preset-name">Kaminfeuer</div><div class="preset-desc">Fire-Effekt, warm</div></div>
+          <div class="preset-arrow">›</div>
+        </div>
+        <div class="preset-item" onclick="applyPreset('white')">
+          <div class="preset-dot" style="background:#ffffff;border:1px solid var(--border)"></div>
+          <div class="preset-info"><div class="preset-name">Tageslicht</div><div class="preset-desc">Reines Weiß, volle Helligkeit</div></div>
+          <div class="preset-arrow">›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Settings -->
+  <div class="page" id="page-settings">
+    <div class="card">
+      <div class="card-title">LED Streifen</div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-label">💡 Anzahl LEDs</div>
+          <div class="setting-desc">Wie viele LEDs hat dein Streifen?</div>
+        </div>
+        <div class="number-input-wrap">
+          <button class="num-btn" onclick="changeNum('ledCount', -1)">−</button>
+          <span class="num-val" id="ledCountVal">60</span>
+          <button class="num-btn" onclick="changeNum('ledCount', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-label">📏 Länge (cm)</div>
+          <div class="setting-desc">Physische Länge des Streifens</div>
+        </div>
+        <div class="number-input-wrap">
+          <button class="num-btn" onclick="changeNum('ledLength', -5)">−</button>
+          <span class="num-val" id="ledLengthVal">100</span>
+          <button class="num-btn" onclick="changeNum('ledLength', 5)">+</button>
+        </div>
+      </div>
+
+      <div class="setting-info-box">
+        <span id="ledDensityInfo">~6 LEDs/10cm · WS2812B 60 LEDs/m</span>
+      </div>
+
+      <button class="apply-btn" onclick="sendLEDConfig()">✓ Übernehmen & senden</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Info</div>
+      <div class="info-list">
+        <div class="info-row"><span class="info-key">Gerät</span><span class="info-val" id="infoDevice">—</span></div>
+        <div class="info-row"><span class="info-key">Status</span><span class="info-val" id="infoStatus">Getrennt</span></div>
+        <div class="info-row"><span class="info-key">LEDs</span><span class="info-val" id="infoLeds">60</span></div>
+        <div class="info-row"><span class="info-key">Länge</span><span class="info-val" id="infoLength">100 cm</span></div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="nav-item active" onclick="switchPage('control', this)"><span class="nav-icon">🎛️</span>Steuern</div>
+  <div class="nav-item" onclick="switchPage('effects', this)"><span class="nav-icon">✨</span>Effekte</div>
+  <div class="nav-item" onclick="switchPage('presets', this)"><span class="nav-icon">⭐</span>Presets</div>
+  <div class="nav-item" onclick="switchPage('settings', this)"><span class="nav-icon">⚙️</span>Setup</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── Service Worker registrieren ────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('✅ SW registered'))
+      .catch(e => console.warn('SW error:', e));
+  });
+}
+
+// ─── iOS Install Banner ──────────────────────────────
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+function isInStandaloneMode() {
+  return window.navigator.standalone === true;
+}
+window.addEventListener('load', () => {
+  const dismissed = localStorage.getItem('installDismissed');
+  if (isIOS() && !isInStandaloneMode() && !dismissed) {
+    document.getElementById('installBanner').classList.add('visible');
+  }
+});
+function dismissInstall() {
+  document.getElementById('installBanner').classList.remove('visible');
+  localStorage.setItem('installDismissed', '1');
+}
+
+// ─── BLE ────────────────────────────────────────────
+const SERVICE_UUID = '12345678-1234-1234-1234-123456789abc';
+const CHAR_WRITE   = '12345678-1234-1234-1234-123456789001';
+
+let device = null, writeChar = null, isConnected = false;
+let sendQueue = [], isSending = false, lastSendTime = 0;
+
+async function toggleBLE() {
+  if (isConnected) { disconnectBLE(); return; }
+  if (!navigator.bluetooth) {
+    showToast('⚠️ Bluefy Browser benötigt!'); return;
+  }
+  try {
+    showToast('🔍 Suche LumaControl...');
+    device = await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true,
+      optionalServices: [SERVICE_UUID]
+    });
+    device.addEventListener('gattserverdisconnected', onDisconnect);
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService(SERVICE_UUID);
+    writeChar = await service.getCharacteristic(CHAR_WRITE);
+    setConnected(true);
+    showToast('✅ Verbunden!');
+  } catch (e) {
+    showToast('❌ ' + (e.message || 'Fehler'));
+  }
+}
+
+function disconnectBLE() {
+  if (device?.gatt.connected) device.gatt.disconnect();
+  setConnected(false);
+}
+function onDisconnect() { setConnected(false); showToast('📴 Getrennt'); }
+function setConnected(val) {
+  isConnected = val;
+  document.getElementById('bleBtn').classList.toggle('connected', val);
+  document.getElementById('bleBtnText').textContent = val ? 'Verbunden' : 'Verbinden';
+  document.getElementById('overlay').classList.toggle('visible', !val);
+}
+
+async function sendBLE(json) {
+  if (!isConnected || !writeChar) return;
+  const now = Date.now();
+  if (now - lastSendTime < 50) { sendQueue = [json]; if (!isSending) drainQueue(); return; }
+  lastSendTime = now;
+  try { await writeChar.writeValueWithoutResponse(new TextEncoder().encode(json)); }
+  catch (e) { console.warn('BLE write:', e); }
+}
+async function drainQueue() {
+  isSending = true;
+  while (sendQueue.length) { await sendBLE(sendQueue.shift()); await new Promise(r=>setTimeout(r,50)); }
+  isSending = false;
+}
+
+// ─── State ──────────────────────────────────────────
+let state = { power:true, brightness:128, hue:0, sat:255, r:255, g:0, b:0, effectId:0, speed:128 };
+
+function togglePower() {
+  state.power = !state.power;
+  document.getElementById('powerToggle').classList.toggle('on', state.power);
+  document.getElementById('powerStatus').textContent = state.power ? 'Eingeschaltet' : 'Ausgeschaltet';
+  if (!state.power) FastLED_clear();
+  sendBLE(JSON.stringify({ cmd:'power', val: state.power?1:0 }));
+}
+function FastLED_clear() {} // ESP macht das selbst
+
+function updateBrightness(v) { state.brightness=+v; document.getElementById('briVal').textContent=Math.round(v/2.55)+'%'; }
+function sendBrightness(v) { sendBLE(JSON.stringify({ cmd:'brightness', val:+v })); }
+
+function updatePreview() { document.getElementById('colorPreview').style.background=`rgb(${state.r},${state.g},${state.b})`; }
+
+function updateHSV() {
+  const h=+document.getElementById('hue-slider').value, s=+document.getElementById('sat-slider').value;
+  state.hue=h; state.sat=s;
+  document.getElementById('hueVal').textContent=Math.round(h/255*360)+'°';
+  document.getElementById('satVal').textContent=Math.round(s/255*100)+'%';
+  const hDeg=Math.round(h/255*360);
+  document.getElementById('sat-slider').style.background=`linear-gradient(to right,hsl(${hDeg},0%,50%),hsl(${hDeg},100%,50%))`;
+  const rgb=hsvToRgb(h/255,s/255,1); state.r=rgb[0]; state.g=rgb[1]; state.b=rgb[2];
+  updatePreview();
+}
+function sendColor() { sendBLE(JSON.stringify({ cmd:'hsv', h:state.hue, s:state.sat, v:state.brightness })); }
+
+function updateRGB() {
+  state.r=+document.getElementById('r-slider').value;
+  state.g=+document.getElementById('g-slider').value;
+  state.b=+document.getElementById('b-slider').value;
+  document.getElementById('rVal').textContent=state.r;
+  document.getElementById('gVal').textContent=state.g;
+  document.getElementById('bVal').textContent=state.b;
+  updatePreview();
+}
+function sendColorRGB() { sendBLE(JSON.stringify({ cmd:'color', r:state.r, g:state.g, b:state.b })); }
+
+function setPalette(r,g,b) {
+  state.r=r; state.g=g; state.b=b;
+  document.getElementById('r-slider').value=r;
+  document.getElementById('g-slider').value=g;
+  document.getElementById('b-slider').value=b;
+  updatePreview();
+  sendBLE(JSON.stringify({ cmd:'color', r, g, b }));
+}
+
+function selectEffect(id) {
+  state.effectId=id;
+  document.querySelectorAll('.effect-btn').forEach(el=>el.classList.toggle('active',+el.dataset.id===id));
+  sendEffect();
+}
+function updateSpeed(v) { state.speed=+v; document.getElementById('speedVal').textContent=Math.round(v/255*100)+'%'; }
+function sendEffect() { sendBLE(JSON.stringify({ cmd:'effect', id:state.effectId, speed:state.speed })); }
+
+const presets = {
+  sunset: {r:255,g:107,b:53,effect:2,speed:80,brightness:180},
+  ocean:  {r:0,g:120,b:255,effect:6,speed:100,brightness:150},
+  party:  {r:255,g:0,b:200,effect:1,speed:240,brightness:255},
+  forest: {r:0,g:200,b:50,effect:5,speed:60,brightness:80},
+  fire:   {r:255,g:80,b:0,effect:4,speed:150,brightness:200},
+  white:  {r:255,g:220,b:180,effect:0,speed:128,brightness:255},
+};
+function applyPreset(name) {
+  const p=presets[name]; state={...state,...p};
+  document.getElementById('brightness-slider').value=p.brightness; updateBrightness(p.brightness);
+  document.getElementById('speed-slider').value=p.speed; updateSpeed(p.speed);
+  updatePreview();
+  sendBLE(JSON.stringify({cmd:'brightness',val:p.brightness}));
+  sendBLE(JSON.stringify({cmd:'color',r:p.r,g:p.g,b:p.b}));
+  setTimeout(()=>sendBLE(JSON.stringify({cmd:'effect',id:p.effect,speed:p.speed})),100);
+  showToast('✅ Preset geladen');
+}
+
+function switchTab(name) {
+  const names=['hsv','rgb','palette'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',names[i]===name));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+name));
+}
+function switchPage(name,el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function hsvToRgb(h,s,v) {
+  let r,g,b; const i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);
+  switch(i%6){case 0:r=v;g=t;b=p;break;case 1:r=q;g=v;b=p;break;case 2:r=p;g=v;b=t;break;case 3:r=p;g=q;b=v;break;case 4:r=t;g=p;b=v;break;case 5:r=v;g=p;b=q;break;}
+  return [Math.round(r*255),Math.round(g*255),Math.round(b*255)];
+}
+
+
+// ─── LED Config ──────────────────────────────────────
+let ledConfig = {
+  ledCount: parseInt(localStorage.getItem('ledCount') || '60'),
+  ledLength: parseInt(localStorage.getItem('ledLength') || '100'),
+};
+
+function initSettings() {
+  document.getElementById('ledCountVal').textContent = ledConfig.ledCount;
+  document.getElementById('ledLengthVal').textContent = ledConfig.ledLength;
+  updateDensityInfo();
+  updateInfoPanel();
+}
+
+function changeNum(key, delta) {
+  if (key === 'ledCount') {
+    ledConfig.ledCount = Math.max(1, Math.min(1000, ledConfig.ledCount + delta));
+    document.getElementById('ledCountVal').textContent = ledConfig.ledCount;
+  } else {
+    ledConfig.ledLength = Math.max(5, Math.min(2000, ledConfig.ledLength + delta));
+    document.getElementById('ledLengthVal').textContent = ledConfig.ledLength;
+  }
+  updateDensityInfo();
+}
+
+function updateDensityInfo() {
+  const density = (ledConfig.ledCount / ledConfig.ledLength * 10).toFixed(1);
+  const ledsPerMeter = (ledConfig.ledCount / ledConfig.ledLength * 100).toFixed(0);
+  document.getElementById('ledDensityInfo').textContent =
+    `~${density} LEDs/10cm · WS2812B ${ledsPerMeter} LEDs/m`;
+}
+
+function updateInfoPanel() {
+  document.getElementById('infoDevice').textContent = device ? (device.name || device.id) : '—';
+  document.getElementById('infoStatus').textContent = isConnected ? '🟢 Verbunden' : '🔴 Getrennt';
+  document.getElementById('infoLeds').textContent = ledConfig.ledCount + ' LEDs';
+  document.getElementById('infoLength').textContent = ledConfig.ledLength + ' cm';
+}
+
+function sendLEDConfig() {
+  localStorage.setItem('ledCount', ledConfig.ledCount);
+  localStorage.setItem('ledLength', ledConfig.ledLength);
+  document.getElementById('infoLeds').textContent = ledConfig.ledCount + ' LEDs';
+  document.getElementById('infoLength').textContent = ledConfig.ledLength + ' cm';
+  sendBLE(JSON.stringify({ cmd:'config', count: ledConfig.ledCount, length: ledConfig.ledLength }));
+  showToast('✅ Einstellungen gespeichert');
+}
+
+initSettings();
+
+
+</body>
+</html>
